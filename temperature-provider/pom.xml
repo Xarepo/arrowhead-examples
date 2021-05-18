@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>eu.arrowhead</groupId>
+  <artifactId>example-service-provider</artifactId>
+  <packaging>jar</packaging>
+  <version>0.0.1</version>
+  <name>Example Service Provider</name>
+  <description>Example Service Provider</description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>11</maven.compiler.release>
+    <kalix.version>0.6.0</kalix.version>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+        <groupId>se.arkalix</groupId>
+        <artifactId>kalix-base</artifactId>
+        <version>${kalix.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>se.arkalix</groupId>
+        <artifactId>kalix-core-plugins</artifactId>
+        <version>${kalix.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>se.arkalix</groupId>
+        <artifactId>kalix-dto-processor</artifactId>
+        <version>${kalix.version}</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>se.arkalix</groupId>
+        <artifactId>kalix-dto</artifactId>
+        <version>${kalix.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jfreechart</artifactId>
+        <version>1.5.3</version>
+    </dependency>
+    <dependency>
+        <groupId>jfree</groupId>
+        <artifactId>jcommon</artifactId>
+        <version>1.0.16</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>3.8.1</version>
+        </plugin>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.2.0</version>
+            <configuration>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+
+                <archive>
+                    <manifest>
+                      <mainClass>eu.arrowhead.core.temperatureprovider.TestProvider</mainClass>
+                    </manifest>
+                </archive>
+
+            </configuration>
+            <executions>
+                <execution>
+                    <id>make-assembly</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>single</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+
+  </build>
+
+</project>
