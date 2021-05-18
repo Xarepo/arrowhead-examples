@@ -11,15 +11,20 @@ import org.jfree.data.time.DynamicTimeSeriesCollection;
 import org.jfree.data.time.Second;
 import org.jfree.data.xy.XYDataset;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class TemperatureChart extends ApplicationFrame {
 
-    private static final String TITLE = "Dynamic Series";
-    private static final float MINMAX = 40;
+    private static final String TITLE = "Temperature";
+    private static final double MIN_TEMPERATURE = 0;
+    private static final double MAX_TEMPERATURE = 30;
+    private static final int MAX_COLOR = 255;
     private static final int COUNT = 2 * 60;
     private static final int UPDATE_INTERVAL_MILLIS = 1000;
     private final Timer timer;
@@ -40,26 +45,42 @@ public class TemperatureChart extends ApplicationFrame {
         this.add(btnPanel, BorderLayout.SOUTH);
 
         timer = new Timer(UPDATE_INTERVAL_MILLIS, new ActionListener() {
-            final float[] newData = new float[1];
+            final float[] latestReading = new float[1];
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                newData[0] = thermometer.getTemperature();
+                double temperature = thermometer.getTemperature();
+                latestReading[0] = (float) temperature;
                 dataset.advanceTime();
-                dataset.appendData(newData);
+                dataset.appendData(latestReading);
+
+                final XYPlot plot = chart.getXYPlot();
+                plot.getRenderer().setSeriesPaint(0, getColor(temperature));
             }
         });
     }
 
+    private static Color getColor(double temperature) {
+        int blue = (int) ((MAX_TEMPERATURE - temperature) * MAX_COLOR / MAX_TEMPERATURE);
+        int red = (int) (temperature * MAX_COLOR / MAX_TEMPERATURE);
+        int green = 0;
+
+        blue = Math.min(MAX_COLOR, Math.max(blue, 0));
+        red = Math.min(MAX_COLOR, Math.max(red, 0));
+
+        return new Color(red, green, blue);
+    }
+
     private JFreeChart createChart(final XYDataset dataset) {
-        final JFreeChart result = ChartFactory.createTimeSeriesChart(
+        final JFreeChart chart = ChartFactory.createTimeSeriesChart(
             TITLE, "hh:mm:ss", "Temperature (c)", dataset, true, true, false);
-        final XYPlot plot = result.getXYPlot();
+        final XYPlot plot = chart.getXYPlot();
+
         ValueAxis domain = plot.getDomainAxis();
         domain.setAutoRange(true);
         ValueAxis range = plot.getRangeAxis();
-        range.setRange(-MINMAX, MINMAX);
-        return result;
+        range.setRange(MIN_TEMPERATURE, MAX_TEMPERATURE);
+        return chart;
     }
 
     public void start() {

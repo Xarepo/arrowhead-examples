@@ -1,4 +1,4 @@
-package eu.arrowhead.core.temperatureprovider;
+package eu.arrowhead.core.common;
 
 import se.arkalix.codec.CodecType;
 import se.arkalix.codec.json.JsonObject;
@@ -46,7 +46,7 @@ public class MonitorableService {
             })
             .get("/systemdata", (request, response) -> {
                 System.out.println("Handling a system data request!");
-                var data = new JsonObject(new JsonPair("uniqueIdentifier", new JsonString(uniqueIdentifier)));
+                JsonObject data = new JsonObject(new JsonPair("uniqueIdentifier", new JsonString(uniqueIdentifier)));
                 SystemDataDto ping = new SystemDataDto.Builder()
                     .data(data)
                     .build();

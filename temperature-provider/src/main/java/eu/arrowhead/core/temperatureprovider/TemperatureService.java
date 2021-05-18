@@ -1,5 +1,6 @@
 package eu.arrowhead.core.temperatureprovider;
 
+import eu.arrowhead.core.common.TemperatureDto;
 import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpService;
@@ -16,13 +17,16 @@ public class TemperatureService {
             .accessPolicy(AccessPolicy.cloud())
             .basePath("/temperature")
             .get("/temp", (request, response) -> {
-                System.out.println("Handling a temperature request!");
-                TempDto temp = new TempDto.Builder()
-                    .celsius(thermometer.getTemperature())
+                double temperature = thermometer.getTemperature();
+                System.out.println("Sending temperature " +
+                    temperature + " to " +
+                    request.consumer().identity().name());
+                TemperatureDto tempDto = new TemperatureDto.Builder()
+                    .celsius(temperature)
                     .build();
                 response
                     .status(HttpStatus.OK)
-                    .body(temp, CodecType.JSON);
+                    .body(tempDto, CodecType.JSON);
 
                 return Future.done();
             });

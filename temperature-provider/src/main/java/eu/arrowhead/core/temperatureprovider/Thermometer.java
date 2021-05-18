@@ -7,24 +7,24 @@ import java.util.TimerTask;
 public class Thermometer {
 
     private static final Random random = new Random();
-    private final float averageTemp;
-    private final int updateInterval = 500;
-    private float temperature;
+    private final double averageTemp;
+    private double temperature;
 
-    public Thermometer(float averageTemp) {
+    public Thermometer(double averageTemp) {
         this.averageTemp = averageTemp;
         temperature = averageTemp;
     }
 
-    private float randomTemperature() {
-        return (float) (averageTemp + random.nextGaussian());
+    private double randomTemperature() {
+        return averageTemp + random.nextGaussian();
     }
 
-    public float getTemperature() {
+    public double getTemperature() {
         return temperature;
     }
 
     public void start() {
+        int updateInterval = 500;
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {

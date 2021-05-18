@@ -1,4 +1,4 @@
-package eu.arrowhead.core.temperatureprovider;
+package eu.arrowhead.core.common;
 
 import se.arkalix.dto.DtoReadableAs;
 import se.arkalix.dto.DtoToString;
@@ -12,6 +12,6 @@ import static se.arkalix.dto.DtoCodec.JSON;
 @DtoReadableAs(JSON)
 @DtoWritableAs(JSON)
 @DtoToString
-public interface Ping {
-    boolean ping();
+public interface Temperature {
+    double celsius();
 }
