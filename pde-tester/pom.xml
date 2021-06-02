@@ -1,4 +1,6 @@
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -8,37 +10,26 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>test-examples-common</artifactId>
+    <artifactId>pde-tester</artifactId>
     <packaging>jar</packaging>
-    <name>Common</name>
-    <description>Classes common for the example system suite</description>
+    <name>PDE Tester</name>
+    <description>PDE Tester System</description>
 
     <dependencies>
         <dependency>
-            <groupId>se.arkalix</groupId>
-            <artifactId>kalix-base</artifactId>
-            <version>${kalix.version}</version>
+            <groupId>eu.arrowhead</groupId>
+            <artifactId>test-examples-common</artifactId>
+            <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>se.arkalix</groupId>
-            <artifactId>kalix-core-plugins</artifactId>
-            <version>${kalix.version}</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.7.0</version>
         </dependency>
         <dependency>
-            <groupId>se.arkalix</groupId>
-            <artifactId>kalix-dto-processor</artifactId>
-            <version>${kalix.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>se.arkalix</groupId>
-            <artifactId>kalix-dto</artifactId>
-            <version>${kalix.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.30</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.7.0</version>
         </dependency>
     </dependencies>
 
@@ -56,6 +47,12 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
 
+                    <archive>
+                        <manifest>
+                            <mainClass>eu.arrowhead.core.pdetester.PdeTester</mainClass>
+                        </manifest>
+                    </archive>
+
                 </configuration>
                 <executions>
                     <execution>
@@ -68,6 +65,7 @@
                 </executions>
             </plugin>
         </plugins>
+
     </build>
 
 </project>

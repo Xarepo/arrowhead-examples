@@ -9,6 +9,7 @@ import se.arkalix.security.identity.TrustStore;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Map;
 
 public class TemperatureProvider {
     public static void main(final String[] args) {
@@ -46,10 +47,12 @@ public class TemperatureProvider {
 
             final InetSocketAddress srSocketAddress = new InetSocketAddress(args[2], Integer.parseInt(args[3]));
             final int localPort = Integer.parseInt(args[4]);
+            final Map<String, String> metadata = Map.of("tempProvider", String.valueOf(localPort));
 
             final ArSystem system = new ArSystem.Builder()
                 .identity(identity)
                 .trustStore(trustStore)
+                .metadata(metadata)
                 .localHostnamePort("localhost", localPort)
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();

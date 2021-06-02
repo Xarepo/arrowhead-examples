@@ -21,7 +21,7 @@ import java.awt.event.ActionListener;
 
 public class TemperatureChart extends ApplicationFrame {
 
-    private static final String TITLE = "Temperature";
+    private static final String TITLE = "Thermometer";
     private static final double MIN_TEMPERATURE = 0;
     private static final double MAX_TEMPERATURE = 30;
     private static final int MAX_COLOR = 255;

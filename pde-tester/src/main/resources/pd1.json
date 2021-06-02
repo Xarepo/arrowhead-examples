@@ -1,0 +1,40 @@
+{
+    "plantDescription": "ArrowHead core",
+    "active": true,
+    "systems": [
+      {
+        "systemName": "fan",
+        "systemId": "fan",
+        "ports": [
+          {
+            "portName": "temperature",
+            "serviceDefinition": "temperature",
+            "consumer": true
+          }
+        ]
+      },
+      {
+        "systemName": "temperature1",
+        "systemId": "temperature1",
+        "ports": [
+          {
+            "portName": "temperature",
+            "serviceDefinition": "temperature",
+            "consumer": false
+          }
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "consumer": {
+          "systemId": "fan",
+          "portName": "temperature"
+        },
+        "producer": {
+          "systemId": "temperature1",
+          "portName": "temperature"
+        }
+      }
+    ]
+  }

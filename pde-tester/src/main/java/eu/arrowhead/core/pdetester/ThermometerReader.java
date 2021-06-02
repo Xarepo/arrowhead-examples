@@ -1,4 +1,4 @@
-package eu.arrowhead.core.fan;
+package eu.arrowhead.core.pdetester;
 
 import eu.arrowhead.core.common.TemperatureDto;
 import se.arkalix.ArSystem;
@@ -21,6 +21,7 @@ public class ThermometerReader {
     final ArSystem system;
     private final HttpClient httpClient;
     private double temperature = 0;
+    private TimerTask task;
 
     public ThermometerReader(final ArSystem system, final HttpClient httpClient) {
         this.system = system;
@@ -34,13 +35,21 @@ public class ThermometerReader {
             .codecTypes(CodecType.JSON)
             .protocolTypes(ProtocolType.HTTP);
 
-        int updateInterval = 1000;
-        new Timer().schedule(new TimerTask() {
+        task = new TimerTask() {
             @Override
             public void run() {
                 readThermometer(serviceQuery);
             }
-        }, 0, updateInterval);
+        };
+
+        int updateInterval = 1000;
+        new Timer().schedule(task, 0, updateInterval);
+    }
+
+    public void stop() {
+        if (task != null) {
+            task.cancel();
+        }
     }
 
     private void readThermometer(ServiceQuery serviceQuery) {
