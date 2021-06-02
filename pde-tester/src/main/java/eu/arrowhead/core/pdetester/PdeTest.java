@@ -65,12 +65,12 @@ public class PdeTest {
     public Future<Void> start() {
         try {
             return putPlantDescription("pd0.json")
-                    .flatMap(result -> ensureNoServicesAvailable())
-                    .flatMap(result -> putPlantDescription("pd1.json"))
-                    .flatMap(response -> {
-                        assertEquals(HttpStatus.OK, response.status());
-                        return retrier.run(this::ensureServicesAvailable);
-                    });
+                .flatMap(result -> ensureNoServicesAvailable())
+                .flatMap(result -> putPlantDescription("pd1.json"))
+                .flatMap(response -> {
+                    assertEquals(HttpStatus.OK, response.status());
+                    return retrier.run(this::ensureServicesAvailable);
+                });
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -88,39 +88,39 @@ public class PdeTest {
 
     private Future<Void> ensureServicesAvailable() {
         return queryServices()
-                .flatMap(services -> {
-                    assertFalse(services.isEmpty());
-                    logger.info("Found avaialable services.");
-                    return Future.done();
-                });
+            .flatMap(services -> {
+                assertFalse(services.isEmpty());
+                logger.info("Found avaialable services.");
+                return Future.done();
+            });
     }
 
     private Future<Set<ServiceRecord>> queryServices() {
         return getServiceQuery()
-                .resolveAll();
+            .resolveAll();
     }
 
     private ServiceQuery getServiceQuery() {
         return system.consume()
-                .name(TEMPERATURE_SERVICE)
-                .codecTypes(CodecType.JSON)
-                .protocolTypes(ProtocolType.HTTP);
+            .name(TEMPERATURE_SERVICE)
+            .codecTypes(CodecType.JSON)
+            .protocolTypes(ProtocolType.HTTP);
     }
 
     private Future<HttpClientResponse> putPlantDescription(String filename) throws IOException {
         final String plantDescription = readStringFromFile(filename);
         return httpClient.send(pdeAddress, new HttpClientRequest()
-                .method(HttpMethod.PUT)
-                .uri("/pde/mgmt/pd/0")
-                .body(plantDescription, Charset.defaultCharset())
-                .header("accept", "application/json"));
+            .method(HttpMethod.PUT)
+            .uri("/pde/mgmt/pd/0")
+            .body(plantDescription, Charset.defaultCharset())
+            .header("accept", "application/json"));
     }
 
     private ServiceQuery getPdeManagementServiceQuery() {
         return system.consume()
-                .name("pde-mgmt")
-                .codecTypes(CodecType.JSON)
-                .protocolTypes(ProtocolType.HTTP);
+            .name("pde-mgmt")
+            .codecTypes(CodecType.JSON)
+            .protocolTypes(ProtocolType.HTTP);
     }
 
     private String readStringFromFile(final String filename) throws IOException {

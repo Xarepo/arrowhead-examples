@@ -2,13 +2,20 @@ package eu.arrowhead.core.pdetester;
 
 import se.arkalix.ArServiceRecordCache;
 import se.arkalix.ArSystem;
+import se.arkalix.codec.CodecType;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.core.plugin.or.OrchestrationOption;
 import se.arkalix.core.plugin.or.OrchestrationPattern;
 import se.arkalix.core.plugin.or.OrchestrationStrategy;
+import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
+import se.arkalix.net.http.service.HttpService;
+import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
+import se.arkalix.util.concurrent.Future;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -31,7 +38,7 @@ public class PdeTester {
 
         KeyStore keyStore = null;
 
-        try (InputStream in = PdeTester.class.getResourceAsStream("/" + path)) {
+        try (InputStream in = getResource(path)) {
             keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             keyStore.load(in, password);
         } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
@@ -40,6 +47,24 @@ public class PdeTester {
         }
 
         return keyStore;
+    }
+
+    /**
+     * Loads the resource at the given path.
+     * {@code path} is first treated as a regular file path. If the resource
+     * cannot be found at that location, an attempt is made to load it from
+     * resources (i.e. within the jar file).
+     *
+     * @param path path to the resource.
+     * @return An {@code InputStream} object representing the resource.
+     */
+    private static InputStream getResource(final String path) throws IOException {
+        File file = new File(path);
+        if (file.isFile()) {
+            return new FileInputStream(file);
+        } else {
+            return PdeTester.class.getResourceAsStream("/" + path);
+        }
     }
 
     private static String getProp(final String propName) {
@@ -54,9 +79,22 @@ public class PdeTester {
         return Integer.parseInt(getProp(propName));
     }
 
+    private static HttpService dummyService() {
+        return new HttpService()
+            .name("dummy")
+            .codecs(CodecType.JSON)
+            .accessPolicy(AccessPolicy.cloud())
+            .basePath("/dummy")
+            .get("/dummy", (request, response) -> {
+                response.status(HttpStatus.OK);
+                return Future.done();
+            });
+    }
+
+
     public static void main(final String[] args) {
 
-        try (InputStream in = PdeTester.class.getResourceAsStream("/" + PropNames.FILENAME)) {
+        try (InputStream in = getResource(PropNames.FILENAME)) {
             appProps.load(in);
         } catch (final IOException e) {
             logger.error("Failed reading " + PropNames.FILENAME, e);
@@ -73,21 +111,20 @@ public class PdeTester {
         final String srAddress = getProp(PropNames.SR_ADDRESS);
         final int srPort = getIntProp(PropNames.SR_PORT);
 
-
         try {
 
             TrustStore trustStore = TrustStore.from(loadKeyStore(trustStorePath, trustStorePassword));
+
             OwnedIdentity identity = new OwnedIdentity.Loader()
                 .keyStore(loadKeyStore(keyStorePath, keyStorePassword))
                 .keyPassword(keyPassword)
                 .keyStorePassword(keyStorePassword)
                 .load();
 
-            // final var trustStore = TrustStore.read(trustStorePath, trustStorePassword);
             Arrays.fill(keyPassword, '\0');
             Arrays.fill(trustStorePassword, '\0');
 
-            final var srSocketAddress = new InetSocketAddress(srAddress, srPort);
+            final InetSocketAddress srSocketAddress = new InetSocketAddress(srAddress, srPort);
 
             final OrchestrationStrategy strategy = new OrchestrationStrategy(
                 new OrchestrationPattern().isIncludingService(true)
@@ -117,7 +154,11 @@ public class PdeTester {
             thermometerReader2.start();
 
             final PdeTest test = new PdeTest(system, httpClient, thermometerReader1, thermometerReader2);
-            test.start()
+
+            // Start by registering a dummy service, in order to get this system
+            // entered in the service registry:
+            system.provide(dummyService())
+                .flatMap(result -> test.start())
                 .ifSuccess(result -> {
                     logger.info("The PDE is running correctly.");
                     System.exit(0);

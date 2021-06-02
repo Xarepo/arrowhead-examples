@@ -33,16 +33,16 @@ public class Fan {
 
         try {
             // Load owned system identity and truststore.
-            final var password = new char[]{'1', '2', '3', '4', '5', '6'};
-            final var identity = new OwnedIdentity.Loader()
+            final char[] password = new char[] {'1', '2', '3', '4', '5', '6'};
+            final OwnedIdentity identity = new OwnedIdentity.Loader()
                 .keyPassword(password)
                 .keyStorePath(Path.of(args[0]))
                 .keyStorePassword(password)
                 .load();
-            final var trustStore = TrustStore.read(Path.of(args[1]), password);
+            final TrustStore trustStore = TrustStore.read(Path.of(args[1]), password);
             Arrays.fill(password, '\0');
 
-            final var srSocketAddress = new InetSocketAddress(args[2], Integer.parseInt(args[3]));
+            final InetSocketAddress srSocketAddress = new InetSocketAddress(args[2], Integer.parseInt(args[3]));
             final int localPort = Integer.parseInt(args[4]);
 
             final OrchestrationStrategy strategy = new OrchestrationStrategy(

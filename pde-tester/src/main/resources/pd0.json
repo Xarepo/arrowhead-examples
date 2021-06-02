@@ -3,8 +3,8 @@
   "active": true,
   "systems": [
     {
-      "systemName": "fan",
-      "systemId": "fan",
+      "systemName": "pdetester",
+      "systemId": "pdetester",
       "ports": [
         {
           "portName": "temperature",
