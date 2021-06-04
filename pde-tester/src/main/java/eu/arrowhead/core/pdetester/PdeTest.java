@@ -37,13 +37,10 @@ public class PdeTest {
     private final HttpClient httpClient;
     private final ArSystem system;
 
-    private final String uid1 = "9001";
-    private final String uid2 = "9002";
-
-    private final Map<String, String> serviceMetadata1 = Metadata.getServiceMetadata(uid1);
-    private final Map<String, String> serviceMetadata2 = Metadata.getServiceMetadata(uid2);
-    private final Map<String, String> systemMetadata1 = Metadata.getSystemMetadata(uid1);
-    private final Map<String, String> systemMetadata2 = Metadata.getSystemMetadata(uid2);
+    private final Map<String, String> serviceMetadataA = Metadata.getServiceMetadata("a");
+    private final Map<String, String> serviceMetadataB = Metadata.getServiceMetadata("b");
+    private final Map<String, String> systemMetadata1 = Metadata.getSystemMetadata("1");
+    private final Map<String, String> systemMetadata2 = Metadata.getSystemMetadata("2");
 
 
     final int retryDelayMillis = 500;
@@ -61,21 +58,21 @@ public class PdeTest {
     public Future<Void> start() {
         try {
             return putPlantDescription(PdFiles.NO_CONNECTIONS)
-                .flatMap(result -> ensureNoServicesAvailable())
-                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_TEMP_1_USING_NAME))
+                .flatMap(result -> assertNoServices())
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_TEMP_1_USING_SYSTEM_NAME))
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
-                    return retrier.run(this::ensureService1Only);
+                    return retrier.run(this::assertBothSystem1Services);
                 })
                 .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_TEMP_2_USING_SYSTEM_METADATA))
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
-                    return retrier.run(this::ensureService2Only);
+                    return retrier.run(this::assertBothSystem2Services);
                 })
                 .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_BOTH_USING_SYSTEM_METADATA)
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
-                    return retrier.run(this::ensureBothServices);
+                    return retrier.run(this::assertAllServices);
                 }));
 
         } catch (IOException e) {
@@ -84,7 +81,7 @@ public class PdeTest {
         }
     }
 
-    private Future<Void> ensureNoServicesAvailable() {
+    private Future<Void> assertNoServices() {
         return queryServices()
             .flatMap(services -> {
                 assertTrue(services.isEmpty());
@@ -93,48 +90,57 @@ public class PdeTest {
             });
     }
 
-    private Future<Void> ensureService1Only() {
-        return queryServices()
-            .flatMap(services -> {
-                assertEquals(1, services.size());
-                ServiceRecord temp1Service = services.stream().findFirst().orElse(null);
-                assertEquals(systemMetadata1, temp1Service.provider().metadata());
-                logger.info("Connected to service 1.");
-                return Future.done();
-            });
-    }
-
-    private Future<Void> ensureService2Only() {
-        return queryServices()
-            .flatMap(services -> {
-                assertEquals(1, services.size());
-                ServiceRecord temp1Service = services.stream().findFirst().orElse(null);
-                assertEquals(systemMetadata2, temp1Service.provider().metadata());
-                logger.info("Connected to service 1.");
-                return Future.done();
-            });
-    }
-
-    private Future<Void> ensureBothServices() {
+    private Future<Void> assertBothSystem1Services() {
         return queryServices()
             .flatMap(services -> {
                 assertEquals(2, services.size());
-                ServiceRecord temp1Service = services.stream()
-                    .filter(service -> service.provider().metadata().equals(systemMetadata1))
-                    .findFirst()
-                    .orElse(null);
-                ServiceRecord temp2Service = services.stream()
-                    .filter(service -> service.provider().metadata().equals(systemMetadata2))
-                    .findFirst()
-                    .orElse(null);
-
-                assertNotNull(temp1Service);
-                assertNotNull(temp2Service);
-                logger.info("Connected to both services.");
+                assertServicePresent(services, systemMetadata1, serviceMetadataA);
+                assertServicePresent(services, systemMetadata1, serviceMetadataB);
                 return Future.done();
             });
     }
 
+    private Future<Void> assertBothSystem2Services() {
+        return queryServices()
+            .flatMap(services -> {
+                assertEquals(2, services.size());
+                assertServicePresent(services, systemMetadata2, serviceMetadataA);
+                assertServicePresent(services, systemMetadata2, serviceMetadataB);
+                return Future.done();
+            });
+    }
+
+    private Future<Void> assertAllServices() {
+        return queryServices()
+            .flatMap(services -> {
+                assertEquals(4, services.size());
+                assertServicePresent(services, systemMetadata1, serviceMetadataA);
+                assertServicePresent(services, systemMetadata1, serviceMetadataB);
+                assertServicePresent(services, systemMetadata2, serviceMetadataA);
+                assertServicePresent(services, systemMetadata2, serviceMetadataB);
+                return Future.done();
+            });
+    }
+
+    private void assertServicePresent(
+        Set<ServiceRecord> services,
+        Map<String, String> systemMetadata,
+        Map<String, String> serviceMetadata
+    ) {
+        ServiceRecord match = services.stream()
+            .filter(service -> matches(service, systemMetadata, serviceMetadata))
+            .findFirst()
+            .orElse(null);
+        assertNotNull(match);
+    }
+
+    private boolean matches(
+        final ServiceRecord service,
+        final Map<String, String> systemMetadata,
+        final Map<String, String> serviceMetadata
+        ) {
+            return systemMetadata.equals(service.provider().metadata()) && serviceMetadata.equals(service.metadata());
+    }
 
     private Future<Set<ServiceRecord>> queryServices() {
         return getServiceQuery()

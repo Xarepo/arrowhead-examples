@@ -26,6 +26,7 @@
         <module>temperature-provider</module>
         <module>fan</module>
         <module>pde-tester</module>
+        <module>dual-provider</module>
     </modules>
 
 </project>

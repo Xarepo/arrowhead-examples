@@ -15,20 +15,7 @@
       },
       {
         "metadata": {
-            "system": "9001"
-        },
-        "systemId": "temperature1",
-        "ports": [
-          {
-            "portName": "temperature",
-            "serviceDefinition": "temperature",
-            "consumer": false
-          }
-        ]
-      },
-      {
-        "metadata": {
-            "system": "9002"
+            "system": "2"
         },
         "systemId": "temperature2",
         "ports": [

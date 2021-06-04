@@ -15,7 +15,7 @@
       },
       {
         "metadata": {
-            "system": "9001"
+            "system": "1"
         },
         "systemId": "temperature1",
         "ports": [
@@ -28,7 +28,7 @@
       },
       {
         "metadata": {
-            "system": "9002"
+            "system": "2"
         },
         "systemId": "temperature2",
         "ports": [
