@@ -1,5 +1,6 @@
 package eu.arrowhead.core.temperatureprovider;
 
+import eu.arrowhead.core.common.Metadata;
 import eu.arrowhead.core.common.MonitorableService;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
@@ -47,17 +48,18 @@ public class TemperatureProvider {
 
             final InetSocketAddress srSocketAddress = new InetSocketAddress(args[2], Integer.parseInt(args[3]));
             final int localPort = Integer.parseInt(args[4]);
-            final Map<String, String> metadata = Map.of("tempProvider", String.valueOf(localPort));
+
+            String uniqueIdentifier = args[4];
+            final Map<String, String> systemMetadata = Metadata.getSystemMetadata(uniqueIdentifier);
 
             final ArSystem system = new ArSystem.Builder()
                 .identity(identity)
                 .trustStore(trustStore)
-                .metadata(metadata)
+                .metadata(systemMetadata)
                 .localHostnamePort("localhost", localPort)
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 
-            String uniqueIdentifier = args[4];
 
             system.provide(new MonitorableService().getService(uniqueIdentifier))
                 .ifSuccess(result -> System.out.println("Providing monitorable service..."))

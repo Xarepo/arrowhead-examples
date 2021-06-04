@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PdeTester {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(PdeTester.class);
     private final static Properties appProps = new Properties();
 
@@ -106,9 +106,9 @@ public class PdeTester {
         final char[] keyStorePassword = getProp(PropNames.KEY_STORE_PASSWORD).toCharArray();
         final String trustStorePath = getProp(PropNames.TRUST_STORE);
         final char[] trustStorePassword = getProp(PropNames.TRUST_STORE_PASSWORD).toCharArray();
-        final String localAddress = getProp(PropNames.LOCAL_ADDRESS);
+        final String localAddress = getProp(PropNames.LOCAL_HOSTNAME);
         final int localPort = getIntProp(PropNames.LOCAL_PORT);
-        final String srAddress = getProp(PropNames.SR_ADDRESS);
+        final String srAddress = getProp(PropNames.SR_HOSTNAME);
         final int srPort = getIntProp(PropNames.SR_PORT);
 
         try {
@@ -147,20 +147,17 @@ public class PdeTester {
                 .trustStore(trustStore)
                 .build();
 
-            final ThermometerReader thermometerReader1 = new ThermometerReader(system, httpClient);
-            final ThermometerReader thermometerReader2 = new ThermometerReader(system, httpClient);
-
-            thermometerReader1.start();
-            thermometerReader2.start();
-
-            final PdeTest test = new PdeTest(system, httpClient, thermometerReader1, thermometerReader2);
+            final String pdeHostname = getProp(PropNames.PDE_HOSTNAME);
+            final int pdePort = Integer.parseInt(getProp(PropNames.PDE_PORT));
+            final InetSocketAddress pdeAddress = new InetSocketAddress(pdeHostname, pdePort);
+            final PdeTest test = new PdeTest(system, httpClient, pdeAddress);
 
             // Start by registering a dummy service, in order to get this system
             // entered in the service registry:
             system.provide(dummyService())
                 .flatMap(result -> test.start())
                 .ifSuccess(result -> {
-                    logger.info("The PDE is running correctly.");
+                    logSuccess();
                     System.exit(0);
                 })
                 .onFailure(e -> {
@@ -170,6 +167,15 @@ public class PdeTester {
         } catch (final Throwable e) {
             fail(e);
         }
+    }
+
+    private static void logSuccess() {
+        logger.info(
+            "\n" +
+            "=======================================\n" +
+            "||   The PDE is running correctly.   ||\n" +
+            "======================================="
+        );
     }
 
     private static void fail(Throwable e) {

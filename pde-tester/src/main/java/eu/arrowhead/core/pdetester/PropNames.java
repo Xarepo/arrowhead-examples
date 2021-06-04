@@ -12,11 +12,11 @@ public class PropNames {
     public final static String TRUST_STORE = "server.ssl.trust-store";
     public final static String TRUST_STORE_PASSWORD = "server.ssl.trust-store-password";
 
-    public final static String LOCAL_ADDRESS = "local_address";
+    public final static String LOCAL_HOSTNAME = "local_address";
     public final static String LOCAL_PORT = "local_port";
-    public final static String PDE_ADDRESS = "pde_address";
+    public final static String PDE_HOSTNAME = "pde_address";
     public final static String PDE_PORT = "pde_port";
-    public final static String SR_ADDRESS = "sr_address";
+    public final static String SR_HOSTNAME = "sr_address";
     public final static String SR_PORT = "sr_port";
-    
+
 }

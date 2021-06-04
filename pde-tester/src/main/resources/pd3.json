@@ -14,7 +14,9 @@
         ]
       },
       {
-        "systemName": "temperature1",
+        "metadata": {
+            "system": "9001"
+        },
         "systemId": "temperature1",
         "ports": [
           {
@@ -25,7 +27,9 @@
         ]
       },
       {
-        "systemName": "temperature2",
+        "metadata": {
+            "system": "9002"
+        },
         "systemId": "temperature2",
         "ports": [
           {
@@ -44,6 +48,16 @@
         },
         "producer": {
           "systemId": "temperature1",
+          "portName": "temperature"
+        }
+      },
+      {
+        "consumer": {
+          "systemId": "pdetester",
+          "portName": "temperature"
+        },
+        "producer": {
+          "systemId": "temperature2",
           "portName": "temperature"
         }
       }
