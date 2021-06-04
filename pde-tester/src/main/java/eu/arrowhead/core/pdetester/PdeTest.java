@@ -21,7 +21,6 @@ import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.net.http.client.HttpClientResponse;
-import se.arkalix.query.ServiceQuery;
 import se.arkalix.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,10 @@ public class PdeTest {
     private final Map<String, String> serviceMetadataB = Metadata.getServiceMetadata("b");
     private final Map<String, String> systemMetadata1 = Metadata.getSystemMetadata("1");
     private final Map<String, String> systemMetadata2 = Metadata.getSystemMetadata("2");
+
+    private final Map<String, String> requesterMetadataX = Metadata.getRequesterMetadata("x");
+    private final Map<String, String> requesterMetadataY = Metadata.getRequesterMetadata("y");
+
 
 
     final int retryDelayMillis = 500;
@@ -79,10 +82,14 @@ public class PdeTest {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertSystem1ServiceA);
                 });
+                // .flatMap(result -> putPlantDescription(PdFiles.CONNECT_BOTH_SYSTEM_2_SERVICES_USING_METADATA))
+                // .flatMap(response -> {
+                //     assertEquals(HttpStatus.OK, response.status());
+                //     return retrier.run(this::assertSystem2ServicesAccessibleByMetadata);
+                // });
 
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            return Future.failure(e);
         }
     }
 
@@ -136,6 +143,21 @@ public class PdeTest {
             });
     }
 
+    private Future<Void> assertSystem2ServicesAccessibleByMetadata() {
+        return queryServices(requesterMetadataX)
+            .flatMap(services -> {
+                assertEquals(1, services.size());
+                assertServicePresent(services, systemMetadata2, serviceMetadataA);
+                return Future.done();
+            })
+            .flatMap(result -> queryServices(requesterMetadataY))
+            .flatMap(services -> {
+                assertEquals(1, services.size());
+                assertServicePresent(services, systemMetadata2, serviceMetadataB);
+                return Future.done();
+            });
+    }
+
     private void assertServicePresent(
         Set<ServiceRecord> services,
         Map<String, String> systemMetadata,
@@ -156,16 +178,17 @@ public class PdeTest {
             return systemMetadata.equals(service.provider().metadata()) && serviceMetadata.equals(service.metadata());
     }
 
-    private Future<Set<ServiceRecord>> queryServices() {
-        return getServiceQuery()
+    private Future<Set<ServiceRecord>> queryServices(final Map<String, String> metadata) {
+        return system.consume()
+            .name(TEMPERATURE_SERVICE)
+            .metadata(metadata)
+            .codecTypes(CodecType.JSON)
+            .protocolTypes(ProtocolType.HTTP)
             .resolveAll();
     }
 
-    private ServiceQuery getServiceQuery() {
-        return system.consume()
-            .name(TEMPERATURE_SERVICE)
-            .codecTypes(CodecType.JSON)
-            .protocolTypes(ProtocolType.HTTP);
+    private Future<Set<ServiceRecord>> queryServices() {
+        return queryServices(null);
     }
 
     private Future<HttpClientResponse> putPlantDescription(String filename) throws IOException {

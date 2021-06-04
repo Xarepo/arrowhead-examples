@@ -7,7 +7,7 @@
       "systemId": "pdetester",
       "ports": [
         {
-          "portName": "temperature",
+          "portName": "port-x",
           "serviceDefinition": "temperature",
           "consumer": true
         }
@@ -18,7 +18,7 @@
       "systemId": "temperature1",
       "ports": [
         {
-          "portName": "temperature",
+          "portName": "port-a",
           "serviceDefinition": "temperature",
           "consumer": false
         }

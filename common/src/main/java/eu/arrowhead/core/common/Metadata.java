@@ -13,4 +13,8 @@ public class Metadata {
     public static Map<String, String> getServiceMetadata(String uniqueIdentifier) {
         return Map.of("service", uniqueIdentifier);
     }
+
+    public static Map<String, String> getRequesterMetadata(String uniqueIdentifier) {
+        return Map.of("port", uniqueIdentifier);
+    }
 }

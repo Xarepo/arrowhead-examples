@@ -7,7 +7,7 @@
         "systemId": "pdetester",
         "ports": [
           {
-            "portName": "temperature",
+            "portName": "port-x",
             "serviceDefinition": "temperature",
             "consumer": true
           }
@@ -20,7 +20,7 @@
         "systemId": "temperature1",
         "ports": [
           {
-            "portName": "temperature",
+            "portName": "port-a",
             "serviceDefinition": "temperature",
             "consumer": false
           }
@@ -33,7 +33,7 @@
         "systemId": "temperature2",
         "ports": [
           {
-            "portName": "temperature",
+            "portName": "port-a",
             "serviceDefinition": "temperature",
             "consumer": false
           }
@@ -44,21 +44,21 @@
       {
         "consumer": {
           "systemId": "pdetester",
-          "portName": "temperature"
+          "portName": "port-x"
         },
         "producer": {
           "systemId": "temperature1",
-          "portName": "temperature"
+          "portName": "port-a"
         }
       },
       {
         "consumer": {
           "systemId": "pdetester",
-          "portName": "temperature"
+          "portName": "port-x"
         },
         "producer": {
           "systemId": "temperature2",
-          "portName": "temperature"
+          "portName": "port-a"
         }
       }
     ]
