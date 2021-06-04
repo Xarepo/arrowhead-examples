@@ -69,11 +69,16 @@ public class PdeTest {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertBothSystem2Services);
                 })
-                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_BOTH_USING_SYSTEM_METADATA)
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_BOTH_USING_SYSTEM_METADATA))
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertAllServices);
-                }));
+                })
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_SYSTEM_1_SERVICE_A))
+                .flatMap(response -> {
+                    assertEquals(HttpStatus.OK, response.status());
+                    return retrier.run(this::assertSystem1ServiceA);
+                });
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,6 +123,15 @@ public class PdeTest {
                 assertServicePresent(services, systemMetadata1, serviceMetadataB);
                 assertServicePresent(services, systemMetadata2, serviceMetadataA);
                 assertServicePresent(services, systemMetadata2, serviceMetadataB);
+                return Future.done();
+            });
+    }
+
+    private Future<Void> assertSystem1ServiceA() {
+        return queryServices()
+            .flatMap(services -> {
+                assertEquals(1, services.size());
+                assertServicePresent(services, systemMetadata1, serviceMetadataA);
                 return Future.done();
             });
     }
