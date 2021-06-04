@@ -41,11 +41,6 @@ public class PdeTest {
     private final Map<String, String> systemMetadata1 = Metadata.getSystemMetadata("1");
     private final Map<String, String> systemMetadata2 = Metadata.getSystemMetadata("2");
 
-    private final Map<String, String> requesterMetadataX = Metadata.getRequesterMetadata("x");
-    private final Map<String, String> requesterMetadataY = Metadata.getRequesterMetadata("y");
-
-
-
     final int retryDelayMillis = 500;
     final int maxRetries = 10;
     final String retryMessage = "Retrying";
@@ -82,11 +77,6 @@ public class PdeTest {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertSystem1ServiceA);
                 });
-                // .flatMap(result -> putPlantDescription(PdFiles.CONNECT_BOTH_SYSTEM_2_SERVICES_USING_METADATA))
-                // .flatMap(response -> {
-                //     assertEquals(HttpStatus.OK, response.status());
-                //     return retrier.run(this::assertSystem2ServicesAccessibleByMetadata);
-                // });
 
         } catch (IOException e) {
             return Future.failure(e);
@@ -143,21 +133,6 @@ public class PdeTest {
             });
     }
 
-    private Future<Void> assertSystem2ServicesAccessibleByMetadata() {
-        return queryServices(requesterMetadataX)
-            .flatMap(services -> {
-                assertEquals(1, services.size());
-                assertServicePresent(services, systemMetadata2, serviceMetadataA);
-                return Future.done();
-            })
-            .flatMap(result -> queryServices(requesterMetadataY))
-            .flatMap(services -> {
-                assertEquals(1, services.size());
-                assertServicePresent(services, systemMetadata2, serviceMetadataB);
-                return Future.done();
-            });
-    }
-
     private void assertServicePresent(
         Set<ServiceRecord> services,
         Map<String, String> systemMetadata,
@@ -178,17 +153,12 @@ public class PdeTest {
             return systemMetadata.equals(service.provider().metadata()) && serviceMetadata.equals(service.metadata());
     }
 
-    private Future<Set<ServiceRecord>> queryServices(final Map<String, String> metadata) {
+    private Future<Set<ServiceRecord>> queryServices() {
         return system.consume()
             .name(TEMPERATURE_SERVICE)
-            .metadata(metadata)
             .codecTypes(CodecType.JSON)
             .protocolTypes(ProtocolType.HTTP)
             .resolveAll();
-    }
-
-    private Future<Set<ServiceRecord>> queryServices() {
-        return queryServices(null);
     }
 
     private Future<HttpClientResponse> putPlantDescription(String filename) throws IOException {

@@ -14,8 +14,8 @@
         ]
       },
       {
-        "systemName": "temperature1",
-        "systemId": "temperature1",
+        "systemName": "dualprovider1",
+        "systemId": "dp1",
         "ports": [
           {
             "portName": "port-a",
@@ -25,8 +25,8 @@
         ]
       },
       {
-        "systemName": "temperature2",
-        "systemId": "temperature2",
+        "systemName": "dualprovider2",
+        "systemId": "dp2",
         "ports": [
           {
             "portName": "port-a",
@@ -43,7 +43,7 @@
           "portName": "port-x"
         },
         "producer": {
-          "systemId": "temperature1",
+          "systemId": "dp1",
           "portName": "port-a"
         }
       }

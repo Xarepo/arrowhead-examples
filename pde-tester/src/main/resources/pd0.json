@@ -14,8 +14,8 @@
       ]
     },
     {
-      "systemName": "temperature1",
-      "systemId": "temperature1",
+      "systemName": "dualprovider1",
+      "systemId": "dp1",
       "ports": [
         {
           "portName": "port-a",

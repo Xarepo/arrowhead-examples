@@ -8,14 +8,20 @@
       "ports": [
         {
           "portName": "port-x",
+          "metadata": {
+              "port": "x"
+          },
           "serviceDefinition": "temperature",
           "consumer": true
         },
         {
-          "portName": "port-y",
-          "serviceDefinition": "temperature",
-          "consumer": true
-        }
+            "portName": "port-y",
+            "metadata": {
+                "port": "y"
+            },
+            "serviceDefinition": "temperature",
+            "consumer": true
+          }
       ]
     },
     {
@@ -29,7 +35,7 @@
           "serviceDefinition": "temperature",
           "metadata": {
             "service": "a"
-          },
+        },
           "consumer": false
         },
         {
@@ -37,7 +43,7 @@
           "serviceDefinition": "temperature",
           "metadata": {
             "service": "b"
-          },
+        },
           "consumer": false
         }
       ]
@@ -52,7 +58,7 @@
           "portName": "port-a",
           "serviceDefinition": "temperature",
           "metadata": {
-            "service": "a"
+              "service": "a"
           },
           "consumer": false
         },
@@ -61,7 +67,7 @@
           "serviceDefinition": "temperature",
           "metadata": {
             "service": "b"
-          },
+        },
           "consumer": false
         }
       ]
@@ -74,19 +80,19 @@
         "portName": "port-x"
       },
       "producer": {
-        "systemId": "sys-1",
+        "systemId": "sys-2",
         "portName": "port-a"
       }
     },
     {
-      "consumer": {
-        "systemId": "pdetester",
-        "portName": "port-y"
-      },
-      "producer": {
-        "systemId": "sys-1",
-        "portName": "port-b"
+        "consumer": {
+          "systemId": "pdetester",
+          "portName": "port-y"
+        },
+        "producer": {
+          "systemId": "sys-2",
+          "portName": "port-b"
+        }
       }
-    }
   ]
 }
