@@ -1,7 +1,6 @@
 package eu.arrowhead.core.temperatureprovider;
 
 import eu.arrowhead.core.common.Metadata;
-import eu.arrowhead.core.common.MonitorableService;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.security.identity.OwnedIdentity;
@@ -30,10 +29,8 @@ public class TemperatureProvider {
         final int baseTemperature = Integer.parseInt(args[5]);
 
         final Thermometer thermometer = new Thermometer(baseTemperature);
-        TemperatureChart chart = new TemperatureChart("Temperature", thermometer);
 
         thermometer.start();
-        chart.start();
 
         try {
             // Load owned system identity and truststore.
@@ -60,12 +57,7 @@ public class TemperatureProvider {
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 
-
-            system.provide(new MonitorableService().getService(uniqueIdentifier))
-                .ifSuccess(result -> System.out.println("Providing monitorable service..."))
-                .onFailure(Throwable::printStackTrace);
-
-            system.provide(new TemperatureService().getService(thermometer))
+            system.provide(new TemperatureService().getService())
                 .ifSuccess(result -> System.out.println("Providing temperature service..."))
                 .onFailure(Throwable::printStackTrace);
 

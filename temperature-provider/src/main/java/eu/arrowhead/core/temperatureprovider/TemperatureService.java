@@ -9,7 +9,7 @@ import se.arkalix.util.concurrent.Future;
 
 public class TemperatureService {
 
-    public HttpService getService(Thermometer thermometer) {
+    public HttpService getService() {
 
         return new HttpService()
             .name("temperature")
@@ -17,12 +17,10 @@ public class TemperatureService {
             .accessPolicy(AccessPolicy.cloud())
             .basePath("/temperature")
             .get("/temp", (request, response) -> {
-                double temperature = thermometer.getTemperature();
-                System.out.println("Sending temperature " +
-                    temperature + " to " +
-                    request.consumer().identity().name());
+                final String recipient = request.consumer().identity().name();
+                System.out.println("Sending temperature to " + recipient);
                 TemperatureDto tempDto = new TemperatureDto.Builder()
-                    .celsius(temperature)
+                    .celsius(25)
                     .build();
                 response
                     .status(HttpStatus.OK)
