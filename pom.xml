@@ -9,7 +9,7 @@
     <properties>
         <base.version>0.0.2</base.version>
         <revision>${base.version}</revision>
-        <kalix.version>9.3.1</kalix.version>
+        <kalix.version>0.6.0</kalix.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
