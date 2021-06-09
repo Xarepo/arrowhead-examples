@@ -2,6 +2,7 @@ package eu.arrowhead.core.temperatureprovider;
 
 import eu.arrowhead.core.common.Metadata;
 import eu.arrowhead.core.common.MonitorableService;
+import eu.arrowhead.core.common.Props;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.security.identity.OwnedIdentity;
@@ -14,49 +15,57 @@ import java.util.Map;
 
 public class TemperatureProvider {
     public static void main(final String[] args) {
-        if (args.length != 6) {
-            System.err.println(
-                "Usage: java -jar example.jar " +
-                    "<keyStorePath>" +
-                    "<trustStorePath> " +
-                    "<serviceRegistryHostname> " +
-                    "<serviceRegistryPort>" +
-                    "<localPort>" +
-                    "<baseTemperature>"
-            );
+        if (args.length != 1) {
+            System.err.println("Usage: java -jar example.jar <path to config file>");
             System.exit(1);
         }
 
-        final int baseTemperature = Integer.parseInt(args[5]);
-
-        final Thermometer thermometer = new Thermometer(baseTemperature);
-        TemperatureChart chart = new TemperatureChart("Temperature", thermometer);
-
-        thermometer.start();
-        chart.start();
-
         try {
-            // Load owned system identity and truststore.
-            final char[] password = new char[]{'1', '2', '3', '4', '5', '6'};
+
+            final Props props = new Props();
+            props.load(args[0]);
+
+            final int baseTemperature = props.getInt(PropNames.BASE_TEMPERATURE);
+
+            final Thermometer thermometer = new Thermometer(baseTemperature);
+            TemperatureChart chart = new TemperatureChart("Temperature", thermometer);
+
+            thermometer.start();
+            chart.start();
+
+            final String keyStorePath = props.getString(PropNames.KEY_STORE);
+            final char[] keyPassword = props.getString(PropNames.KEY_STORE_PASSWORD).toCharArray();
+            final char[] keyStorePassword = props.getString(PropNames.KEY_STORE_PASSWORD).toCharArray();
             final OwnedIdentity identity = new OwnedIdentity.Loader()
-                .keyPassword(password)
-                .keyStorePath(Path.of(args[0]))
-                .keyStorePassword(password)
+                .keyPassword(keyPassword)
+                .keyStorePath(Path.of(keyStorePath))
+                .keyStorePassword(keyStorePassword)
                 .load();
-            final TrustStore trustStore = TrustStore.read(Path.of(args[1]), password);
-            Arrays.fill(password, '\0');
 
-            final InetSocketAddress srSocketAddress = new InetSocketAddress(args[2], Integer.parseInt(args[3]));
-            final int localPort = Integer.parseInt(args[4]);
+            final String trustStorePath = props.getString(PropNames.TRUST_STORE);
+            final char[] trustStorePassword = props.getString(PropNames.TRUST_STORE_PASSWORD).toCharArray();
 
-            String uniqueIdentifier = args[4];
+            final TrustStore trustStore = TrustStore.read(trustStorePath, trustStorePassword);
+
+            Arrays.fill(keyPassword, '\0');
+            Arrays.fill(keyStorePassword, '\0');
+            Arrays.fill(trustStorePassword, '\0');
+
+            final String localHostname = props.getString(PropNames.LOCAL_HOSTNAME);
+            final int localPort = props.getInt(PropNames.LOCAL_PORT);
+
+            final String srHostname = props.getString(PropNames.SR_HOSTNAME);
+            final int srPort = props.getInt(PropNames.SR_PORT);
+            final InetSocketAddress srSocketAddress = new InetSocketAddress(srHostname, srPort);
+
+            String uniqueIdentifier = String.valueOf(baseTemperature);
             final Map<String, String> systemMetadata = Metadata.getSystemMetadata(uniqueIdentifier);
 
             final ArSystem system = new ArSystem.Builder()
                 .identity(identity)
                 .trustStore(trustStore)
                 .metadata(systemMetadata)
-                .localHostnamePort("localhost", localPort)
+                .localHostnamePort(localHostname, localPort)
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 

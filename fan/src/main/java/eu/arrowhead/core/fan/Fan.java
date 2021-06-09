@@ -1,6 +1,7 @@
 package eu.arrowhead.core.fan;
 
 import eu.arrowhead.core.common.MonitorableService;
+import eu.arrowhead.core.common.Props;
 import se.arkalix.ArServiceRecordCache;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
@@ -19,31 +20,40 @@ import java.util.Arrays;
 public class Fan {
 
     public static void main(final String[] args) {
-        if (args.length != 5) {
-            System.err.println(
-                "Usage: java -jar example.jar " +
-                    "<keyStorePath>" +
-                    "<trustStorePath> " +
-                    "<serviceRegistryHostname> " +
-                    "<serviceRegistryPort>" +
-                    "<localPort>"
-            );
+        if (args.length != 1) {
+            System.err.println("Usage: java -jar example.jar <path to config file>");
             System.exit(1);
         }
 
         try {
-            // Load owned system identity and truststore.
-            final char[] password = new char[] {'1', '2', '3', '4', '5', '6'};
-            final OwnedIdentity identity = new OwnedIdentity.Loader()
-                .keyPassword(password)
-                .keyStorePath(Path.of(args[0]))
-                .keyStorePassword(password)
-                .load();
-            final TrustStore trustStore = TrustStore.read(Path.of(args[1]), password);
-            Arrays.fill(password, '\0');
 
-            final InetSocketAddress srSocketAddress = new InetSocketAddress(args[2], Integer.parseInt(args[3]));
-            final int localPort = Integer.parseInt(args[4]);
+            final Props props = new Props();
+            props.load(args[0]);
+
+            final String keyStorePath = props.getString(PropNames.KEY_STORE);
+            final char[] keyPassword = props.getString(PropNames.KEY_STORE_PASSWORD).toCharArray();
+            final char[] keyStorePassword = props.getString(PropNames.KEY_STORE_PASSWORD).toCharArray();
+            final OwnedIdentity identity = new OwnedIdentity.Loader()
+                .keyPassword(keyPassword)
+                .keyStorePath(Path.of(keyStorePath))
+                .keyStorePassword(keyStorePassword)
+                .load();
+
+            final String trustStorePath = props.getString(PropNames.TRUST_STORE);
+            final char[] trustStorePassword = props.getString(PropNames.TRUST_STORE_PASSWORD).toCharArray();
+
+            final TrustStore trustStore = TrustStore.read(trustStorePath, trustStorePassword);
+
+            Arrays.fill(keyPassword, '\0');
+            Arrays.fill(keyStorePassword, '\0');
+            Arrays.fill(trustStorePassword, '\0');
+
+            final String localHostname = props.getString(PropNames.LOCAL_HOSTNAME);
+            final int localPort = props.getInt(PropNames.LOCAL_PORT);
+
+            final String srHostname = props.getString(PropNames.SR_HOSTNAME);
+            final int srPort = props.getInt(PropNames.SR_PORT);
+            final InetSocketAddress srSocketAddress = new InetSocketAddress(srHostname, srPort);
 
             final OrchestrationStrategy strategy = new OrchestrationStrategy(
                 new OrchestrationPattern().isIncludingService(true)
@@ -53,7 +63,7 @@ public class Fan {
             final ArSystem system = new ArSystem.Builder()
                 .identity(identity)
                 .trustStore(trustStore)
-                .localHostnamePort("localhost", localPort)
+                .localHostnamePort(localHostname, localPort)
                 .serviceCache(ArServiceRecordCache.withEntryLifetimeLimit(Duration.ZERO))
                 .plugins(new HttpJsonCloudPlugin.Builder()
                     .orchestrationStrategy(strategy)
@@ -72,9 +82,8 @@ public class Fan {
             FanAnimation frame = new FanAnimation(thermometerReader);
             frame.init();
 
-            String uniqueIdentifier = args[4];
-
-            system.provide(new MonitorableService().getService(uniqueIdentifier))
+            final String uid = props.getString(PropNames.UID);
+            system.provide(new MonitorableService().getService(uid))
                 .ifSuccess(result -> System.out.println("Providing monitorable service..."))
                 .onFailure(Throwable::printStackTrace);
 

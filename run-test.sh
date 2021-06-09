@@ -1,10 +1,10 @@
 java -jar dual-provider/target/*-jar-with-dependencies.jar \
-    config/properties/dualprovider1.properties &
+    config/properties/dual-provider-1.properties &
 
 dualProvider1=$!
 
 java -jar dual-provider/target/*-jar-with-dependencies.jar \
-    config/properties/dualprovider2.properties &
+    config/properties/dual-provider-2.properties &
 
 dualProvider2=$!
 
