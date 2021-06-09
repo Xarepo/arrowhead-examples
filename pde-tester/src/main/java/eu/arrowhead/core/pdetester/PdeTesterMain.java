@@ -14,70 +14,17 @@ import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Future;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import eu.arrowhead.core.common.PropertyException;
+import eu.arrowhead.core.common.Props;
 
 public class PdeTesterMain {
 
     private static final Logger logger = LoggerFactory.getLogger(PdeTesterMain.class);
-    private final static Properties appProps = new Properties();
-
-    private static KeyStore loadKeyStore(String path, char[] password) {
-
-        KeyStore keyStore = null;
-
-        try (InputStream in = getResource(path)) {
-            keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            keyStore.load(in, password);
-        } catch (IOException | NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
-            logger.error("Failed to load key store", e);
-            System.exit(1);
-        }
-
-        return keyStore;
-    }
-
-    /**
-     * Loads the resource at the given path.
-     * {@code path} is first treated as a regular file path. If the resource
-     * cannot be found at that location, an attempt is made to load it from
-     * resources (i.e. within the jar file).
-     *
-     * @param path path to the resource.
-     * @return An {@code InputStream} object representing the resource.
-     */
-    private static InputStream getResource(final String path) throws IOException {
-        File file = new File(path);
-        if (file.isFile()) {
-            return new FileInputStream(file);
-        } else {
-            return PdeTesterMain.class.getResourceAsStream("/" + path);
-        }
-    }
-
-    private static String getProp(final String propName) {
-        final String result = appProps.getProperty(propName);
-        if (result == null) {
-            throw new IllegalArgumentException("Missing field '" + propName + "' in application properties.");
-        }
-        return result;
-    }
-
-    private static int getIntProp(final String propName) {
-        return Integer.parseInt(getProp(propName));
-    }
 
     private static HttpService dummyService() {
         return new HttpService()
@@ -92,36 +39,37 @@ public class PdeTesterMain {
     }
 
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws PropertyException {
 
-        try (InputStream in = getResource(PropNames.FILENAME)) {
-            appProps.load(in);
-        } catch (final IOException e) {
-            logger.error("Failed reading " + PropNames.FILENAME, e);
+        if (args.length != 1) {
+            System.err.println("Usage: java -jar example.jar <path to config file>");
             System.exit(1);
         }
 
-        final char[] keyPassword = getProp(PropNames.KEY_PASSWORD).toCharArray();
-        final String keyStorePath = getProp(PropNames.KEY_STORE);
-        final char[] keyStorePassword = getProp(PropNames.KEY_STORE_PASSWORD).toCharArray();
-        final String trustStorePath = getProp(PropNames.TRUST_STORE);
-        final char[] trustStorePassword = getProp(PropNames.TRUST_STORE_PASSWORD).toCharArray();
-        final String localAddress = getProp(PropNames.LOCAL_HOSTNAME);
-        final int localPort = getIntProp(PropNames.LOCAL_PORT);
-        final String srAddress = getProp(PropNames.SR_HOSTNAME);
-        final int srPort = getIntProp(PropNames.SR_PORT);
+        final Props props = new Props();
+        props.load(args[0]);
+
+        final char[] keyPassword = props.getString(PropNames.KEY_PASSWORD).toCharArray();
+        final String keyStorePath = props.getString(PropNames.KEY_STORE);
+        final char[] keyStorePassword = props.getString(PropNames.KEY_STORE_PASSWORD).toCharArray();
+        final String trustStorePath = props.getString(PropNames.TRUST_STORE);
+        final char[] trustStorePassword = props.getString(PropNames.TRUST_STORE_PASSWORD).toCharArray();
+        final String localAddress = props.getString(PropNames.LOCAL_HOSTNAME);
+        final int localPort = props.getInt(PropNames.LOCAL_PORT);
+        final String srAddress = props.getString(PropNames.SR_HOSTNAME);
+        final int srPort = props.getInt(PropNames.SR_PORT);
 
         try {
 
-            TrustStore trustStore = TrustStore.from(loadKeyStore(trustStorePath, trustStorePassword));
-
-            OwnedIdentity identity = new OwnedIdentity.Loader()
-                .keyStore(loadKeyStore(keyStorePath, keyStorePassword))
+            final TrustStore trustStore = TrustStore.read(trustStorePath, trustStorePassword);
+            final OwnedIdentity identity = new OwnedIdentity.Loader()
                 .keyPassword(keyPassword)
+                .keyStorePath(keyStorePath)
                 .keyStorePassword(keyStorePassword)
                 .load();
 
             Arrays.fill(keyPassword, '\0');
+            Arrays.fill(keyStorePassword, '\0');
             Arrays.fill(trustStorePassword, '\0');
 
             final InetSocketAddress srSocketAddress = new InetSocketAddress(srAddress, srPort);
@@ -147,8 +95,8 @@ public class PdeTesterMain {
                 .trustStore(trustStore)
                 .build();
 
-            final String pdeHostname = getProp(PropNames.PDE_HOSTNAME);
-            final int pdePort = Integer.parseInt(getProp(PropNames.PDE_PORT));
+            final String pdeHostname = props.getString(PropNames.PDE_HOSTNAME);
+            final int pdePort = Integer.parseInt(props.getString(PropNames.PDE_PORT));
             final InetSocketAddress pdeAddress = new InetSocketAddress(pdeHostname, pdePort);
             final PdeTester test = new PdeTester(system, httpClient, pdeAddress);
 

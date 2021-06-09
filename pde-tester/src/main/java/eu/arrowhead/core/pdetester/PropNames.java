@@ -4,19 +4,17 @@ public class PropNames {
 
     private PropNames() {}
 
-    public final static String FILENAME = "application.properties";
+    public static final String KEY_STORE = "key-store";
+    public static final String KEY_PASSWORD = "key-password";
+    public static final String KEY_STORE_PASSWORD = "key-store-password";
+    public final static String TRUST_STORE = "trust-store";
+    public final static String TRUST_STORE_PASSWORD = "trust-store-password";
 
-    public final static String KEY_STORE = "server.ssl.key-store";
-    public final static String KEY_STORE_PASSWORD = "server.ssl.key-store-password";
-    public final static String KEY_PASSWORD = "server.ssl.key-password";
-    public final static String TRUST_STORE = "server.ssl.trust-store";
-    public final static String TRUST_STORE_PASSWORD = "server.ssl.trust-store-password";
-
-    public final static String LOCAL_HOSTNAME = "local_address";
+    public final static String LOCAL_HOSTNAME = "local_hostname";
     public final static String LOCAL_PORT = "local_port";
-    public final static String PDE_HOSTNAME = "pde_address";
+    public final static String PDE_HOSTNAME = "pde_hostname";
     public final static String PDE_PORT = "pde_port";
-    public final static String SR_HOSTNAME = "sr_address";
+    public final static String SR_HOSTNAME = "sr_hostname";
     public final static String SR_PORT = "sr_port";
 
 }

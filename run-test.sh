@@ -1,11 +1,19 @@
 java -jar dual-provider/target/*-jar-with-dependencies.jar \
-    config/certificates/dualprovider1.p12 \
-    config/certificates/truststore.p12 \
-    127.0.0.1 8443 9000 1 &
+    config/properties/dualprovider1.properties &
+
+dualProvider1=$!
 
 java -jar dual-provider/target/*-jar-with-dependencies.jar \
-    config/certificates/dualprovider2.p12 \
-    config/certificates/truststore.p12 \
-    127.0.0.1 8443 9004 2 &
+    config/properties/dualprovider2.properties &
 
-java -jar pde-tester/target/*-jar-with-dependencies.jar
+dualProvider2=$!
+
+java -jar pde-tester/target/*-jar-with-dependencies.jar \
+    config/properties/pde-tester.properties &
+
+pdeTester=$!
+
+wait $pdeTester
+
+kill $dualProvider1
+kill $dualProvider2
