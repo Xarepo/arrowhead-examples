@@ -49,7 +49,7 @@
 
                     <archive>
                         <manifest>
-                            <mainClass>eu.arrowhead.core.pdetester.PdeTester</mainClass>
+                            <mainClass>eu.arrowhead.core.pdetester.PdeTesterMain</mainClass>
                         </manifest>
                     </archive>
 
