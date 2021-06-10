@@ -1,0 +1,75 @@
+{
+    "plantDescription": "CONNECT_TO_SYS_2_SERVICE_B_USING_CONSUMER_SYSTEM_METADATA",
+    "active": true,
+    "systems": [
+      {
+        "metadata": {
+            "a": "1"
+        },
+        "systemId": "pdetester",
+        "ports": [
+          {
+            "portName": "port-x",
+            "serviceDefinition": "temperature",
+            "consumer": true
+          }
+        ]
+      },
+      {
+        "systemName": "dualprovider1",
+        "systemId": "dp1",
+        "ports": [
+          {
+            "portName": "port-a",
+            "serviceDefinition": "temperature",
+            "metadata": {
+                "service": "a"
+            },
+            "consumer": false
+            },
+            {
+            "portName": "port-b",
+            "serviceDefinition": "temperature",
+            "metadata": {
+                "service": "b"
+            },
+            "consumer": false
+            }
+        ]
+      },
+      {
+        "systemName": "dualprovider2",
+        "systemId": "dp2",
+        "ports": [
+          {
+            "portName": "port-a",
+            "serviceDefinition": "temperature",
+            "metadata": {
+                "service": "a"
+            },
+              "consumer": false
+          },
+          {
+            "portName": "port-b",
+            "serviceDefinition": "temperature",
+            "metadata": {
+                "service": "b"
+            },
+              "consumer": false
+          }
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "consumer": {
+          "systemId": "pdetester",
+          "portName": "port-x"
+        },
+        "producer": {
+          "systemId": "dp2",
+          "portName": "port-b"
+        }
+      }
+    ]
+  }

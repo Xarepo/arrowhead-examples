@@ -70,8 +70,18 @@
       },
       "producer": {
         "systemId": "sys-1",
-        "portName": "port-a"
+        "portName": "port-b"
       }
-    }
+    },
+    {
+        "consumer": {
+          "systemId": "pdetester",
+          "portName": "port-x"
+        },
+        "producer": {
+          "systemId": "sys-2",
+          "portName": "port-b"
+        }
+      }
   ]
 }

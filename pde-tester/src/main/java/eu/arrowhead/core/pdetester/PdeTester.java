@@ -69,7 +69,7 @@ public class PdeTester {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertAllServices);
                 })
-                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_SYSTEM_1_SERVICE_A))
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_SYS_1_SERVICE_A))
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertSystem1ServiceA);
@@ -78,6 +78,16 @@ public class PdeTester {
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertBothSystem2Services);
+                })
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_SYS_2_SERVICE_B_USING_CONSUMER_SYSTEM_METADATA))
+                .flatMap(response -> {
+                    assertEquals(HttpStatus.OK, response.status());
+                    return retrier.run(this::assertSystem2ServiceB);
+                })
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_B_SERVICES))
+                .flatMap(response -> {
+                    assertEquals(HttpStatus.OK, response.status());
+                    return retrier.run(this::assertBothBServices);
                 });
 
         } catch (IOException e) {
@@ -131,6 +141,25 @@ public class PdeTester {
             .flatMap(services -> {
                 assertEquals(1, services.size());
                 assertServicePresent(services, systemMetadata1, serviceMetadataA);
+                return Future.done();
+            });
+    }
+
+    private Future<Void> assertSystem2ServiceB() {
+        return queryServices()
+            .flatMap(services -> {
+                assertEquals(1, services.size());
+                assertServicePresent(services, systemMetadata2, serviceMetadataB);
+                return Future.done();
+            });
+    }
+
+    private Future<Void> assertBothBServices() {
+        return queryServices()
+            .flatMap(services -> {
+                assertEquals(2, services.size());
+                assertServicePresent(services, systemMetadata1, serviceMetadataB);
+                assertServicePresent(services, systemMetadata2, serviceMetadataB);
                 return Future.done();
             });
     }
