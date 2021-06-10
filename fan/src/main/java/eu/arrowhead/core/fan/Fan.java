@@ -31,7 +31,7 @@ public class Fan {
             props.load(args[0]);
 
             final String keyStorePath = props.getString(PropNames.KEY_STORE);
-            final char[] keyPassword = props.getString(PropNames.KEY_STORE_PASSWORD).toCharArray();
+            final char[] keyPassword = props.getString(PropNames.KEY_PASSWORD).toCharArray();
             final char[] keyStorePassword = props.getString(PropNames.KEY_STORE_PASSWORD).toCharArray();
             final OwnedIdentity identity = new OwnedIdentity.Loader()
                 .keyPassword(keyPassword)

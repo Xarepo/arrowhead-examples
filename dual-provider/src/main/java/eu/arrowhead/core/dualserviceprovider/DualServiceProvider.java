@@ -7,6 +7,7 @@ import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
+
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -66,9 +67,7 @@ public class DualServiceProvider {
 
             system.provide(serviceA)
                 .flatMap(result -> system.provide(serviceB))
-                .onFailure(e -> {
-                    e.printStackTrace();
-                });
+                .onFailure(Throwable::printStackTrace);
 
 
         } catch (final Throwable e) {

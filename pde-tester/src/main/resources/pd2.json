@@ -1,42 +1,42 @@
 {
-    "plantDescription": "CONNECT_TO_TEMP_2_USING_SYSTEM_METADATA",
-    "active": true,
-    "systems": [
-      {
-        "systemName": "pdetester",
-        "systemId": "pdetester",
-        "ports": [
-          {
-            "portName": "port-x",
-            "serviceDefinition": "temperature",
-            "consumer": true
-          }
-        ]
-      },
-      {
-        "metadata": {
-            "system": "2"
-        },
-        "systemId": "dp2",
-        "ports": [
-          {
-            "portName": "port-a",
-            "serviceDefinition": "temperature",
-            "consumer": false
-          }
-        ]
-      }
-    ],
-    "connections": [
-      {
-        "consumer": {
-          "systemId": "pdetester",
-          "portName": "port-x"
-        },
-        "producer": {
-          "systemId": "dp2",
-          "portName": "port-a"
+  "plantDescription": "CONNECT_TO_TEMP_2_USING_SYSTEM_METADATA",
+  "active": true,
+  "systems": [
+    {
+      "systemName": "pdetester",
+      "systemId": "pdetester",
+      "ports": [
+        {
+          "portName": "port-x",
+          "serviceDefinition": "temperature",
+          "consumer": true
         }
+      ]
+    },
+    {
+      "metadata": {
+        "system": "2"
+      },
+      "systemId": "dp2",
+      "ports": [
+        {
+          "portName": "port-a",
+          "serviceDefinition": "temperature",
+          "consumer": false
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "consumer": {
+        "systemId": "pdetester",
+        "portName": "port-x"
+      },
+      "producer": {
+        "systemId": "dp2",
+        "portName": "port-a"
       }
-    ]
-  }
+    }
+  ]
+}

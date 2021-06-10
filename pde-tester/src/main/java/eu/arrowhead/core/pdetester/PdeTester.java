@@ -1,17 +1,8 @@
 package eu.arrowhead.core.pdetester;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import eu.arrowhead.core.common.Metadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.ArSystem;
 import se.arkalix.ServiceRecord;
 import se.arkalix.codec.CodecType;
@@ -22,30 +13,36 @@ import se.arkalix.net.http.client.HttpClient;
 import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.net.http.client.HttpClientResponse;
 import se.arkalix.util.concurrent.Future;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import eu.arrowhead.core.common.Metadata;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PdeTester {
 
     private static final Logger logger = LoggerFactory.getLogger(PdeTester.class);
-
+    final int retryDelayMillis = 500;
+    final int maxRetries = 10;
+    final String retryMessage = "Retrying";
+    final RetryFuture retrier = new RetryFuture(retryDelayMillis, maxRetries, retryMessage);
     private final String TEMPERATURE_SERVICE = "temperature";
     private final InetSocketAddress pdeAddress;
-
     private final HttpClient httpClient;
     private final ArSystem system;
-
     private final Map<String, String> serviceMetadataA = Metadata.getServiceMetadata("a");
     private final Map<String, String> serviceMetadataB = Metadata.getServiceMetadata("b");
     private final Map<String, String> systemMetadata1 = Metadata.getSystemMetadata("1");
     private final Map<String, String> systemMetadata2 = Metadata.getSystemMetadata("2");
-
-    final int retryDelayMillis = 500;
-    final int maxRetries = 10;
-    final String retryMessage = "Retrying";
-
-    final RetryFuture retrier = new RetryFuture(retryDelayMillis, maxRetries, retryMessage);
 
     public PdeTester(final ArSystem system, final HttpClient httpClient, final InetSocketAddress pdeAddress) {
         this.system = Objects.requireNonNull(system, "Expected Arrowhead system");
@@ -149,8 +146,8 @@ public class PdeTester {
         final ServiceRecord service,
         final Map<String, String> systemMetadata,
         final Map<String, String> serviceMetadata
-        ) {
-            return systemMetadata.equals(service.provider().metadata()) && serviceMetadata.equals(service.metadata());
+    ) {
+        return systemMetadata.equals(service.provider().metadata()) && serviceMetadata.equals(service.metadata());
     }
 
     private Future<Set<ServiceRecord>> queryServices() {
@@ -172,14 +169,19 @@ public class PdeTester {
 
     private String readStringFromFile(final String filename) throws IOException {
         final InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename);
+
+        if (inputStream == null) {
+            throw new IOException("Failed to read file " + filename);
+        }
+
         final InputStreamReader isReader = new InputStreamReader(inputStream);
         final BufferedReader reader = new BufferedReader(isReader);
-        final StringBuffer stringBuffer = new StringBuffer();
+        final StringBuilder stringBuilder = new StringBuilder();
         String str;
         while ((str = reader.readLine()) != null) {
-            stringBuffer.append(str);
+            stringBuilder.append(str);
         }
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 
 }

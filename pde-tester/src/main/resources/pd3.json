@@ -1,65 +1,65 @@
 {
-    "plantDescription": "CONNECT_TO_BOTH_USING_SYSTEM_METADATA",
-    "active": true,
-    "systems": [
-      {
-        "systemName": "pdetester",
+  "plantDescription": "CONNECT_TO_BOTH_USING_SYSTEM_METADATA",
+  "active": true,
+  "systems": [
+    {
+      "systemName": "pdetester",
+      "systemId": "pdetester",
+      "ports": [
+        {
+          "portName": "port-x",
+          "serviceDefinition": "temperature",
+          "consumer": true
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "system": "1"
+      },
+      "systemId": "dp1",
+      "ports": [
+        {
+          "portName": "port-a",
+          "serviceDefinition": "temperature",
+          "consumer": false
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "system": "2"
+      },
+      "systemId": "dp2",
+      "ports": [
+        {
+          "portName": "port-a",
+          "serviceDefinition": "temperature",
+          "consumer": false
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "consumer": {
         "systemId": "pdetester",
-        "ports": [
-          {
-            "portName": "port-x",
-            "serviceDefinition": "temperature",
-            "consumer": true
-          }
-        ]
+        "portName": "port-x"
       },
-      {
-        "metadata": {
-            "system": "1"
-        },
+      "producer": {
         "systemId": "dp1",
-        "ports": [
-          {
-            "portName": "port-a",
-            "serviceDefinition": "temperature",
-            "consumer": false
-          }
-        ]
+        "portName": "port-a"
+      }
+    },
+    {
+      "consumer": {
+        "systemId": "pdetester",
+        "portName": "port-x"
       },
-      {
-        "metadata": {
-            "system": "2"
-        },
+      "producer": {
         "systemId": "dp2",
-        "ports": [
-          {
-            "portName": "port-a",
-            "serviceDefinition": "temperature",
-            "consumer": false
-          }
-        ]
+        "portName": "port-a"
       }
-    ],
-    "connections": [
-      {
-        "consumer": {
-          "systemId": "pdetester",
-          "portName": "port-x"
-        },
-        "producer": {
-          "systemId": "dp1",
-          "portName": "port-a"
-        }
-      },
-      {
-        "consumer": {
-          "systemId": "pdetester",
-          "portName": "port-x"
-        },
-        "producer": {
-          "systemId": "dp2",
-          "portName": "port-a"
-        }
-      }
-    ]
-  }
+    }
+  ]
+}

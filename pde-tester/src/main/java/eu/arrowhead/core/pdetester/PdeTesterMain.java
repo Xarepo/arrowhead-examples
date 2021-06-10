@@ -1,5 +1,9 @@
 package eu.arrowhead.core.pdetester;
 
+import eu.arrowhead.core.common.PropertyException;
+import eu.arrowhead.core.common.Props;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.arkalix.ArServiceRecordCache;
 import se.arkalix.ArSystem;
 import se.arkalix.codec.CodecType;
@@ -14,13 +18,10 @@ import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
 import se.arkalix.util.concurrent.Future;
+
 import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.Arrays;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import eu.arrowhead.core.common.PropertyException;
-import eu.arrowhead.core.common.Props;
 
 public class PdeTesterMain {
 
@@ -108,9 +109,7 @@ public class PdeTesterMain {
                     logSuccess();
                     System.exit(0);
                 })
-                .onFailure(e -> {
-                    fail(e);
-                });
+                .onFailure(PdeTesterMain::fail);
 
         } catch (final Throwable e) {
             fail(e);
@@ -120,9 +119,9 @@ public class PdeTesterMain {
     private static void logSuccess() {
         logger.info(
             "\n" +
-            "=======================================\n" +
-            "||   The PDE is running correctly.   ||\n" +
-            "======================================="
+                "=======================================\n" +
+                "||   The PDE is running correctly.   ||\n" +
+                "======================================="
         );
     }
 
