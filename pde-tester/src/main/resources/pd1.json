@@ -1,5 +1,5 @@
 {
-  "plantDescription": "CONNECT_TO_TEMP_1_USING_SYSTEM_NAME",
+  "plantDescription": "CONNECT_TO_SYS_1_USING_PROVIDER_SYSTEM_NAME",
   "active": true,
   "systems": [
     {

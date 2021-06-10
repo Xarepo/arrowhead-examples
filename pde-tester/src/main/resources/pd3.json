@@ -1,5 +1,5 @@
 {
-  "plantDescription": "CONNECT_TO_BOTH_USING_SYSTEM_METADATA",
+  "plantDescription": "CONNECT_TO_BOTH_USING_PROVIDER_SYSTEM_METADATA",
   "active": true,
   "systems": [
     {

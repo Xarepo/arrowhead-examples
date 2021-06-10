@@ -1,5 +1,6 @@
 package eu.arrowhead.core.pdetester;
 
+import eu.arrowhead.core.common.Metadata;
 import eu.arrowhead.core.common.PropertyException;
 import eu.arrowhead.core.common.Props;
 import org.slf4j.Logger;
@@ -84,6 +85,7 @@ public class PdeTesterMain {
                 .identity(identity)
                 .trustStore(trustStore)
                 .localHostnamePort(localAddress, localPort)
+                .metadata(Metadata.getConsumerMetadata())
                 .serviceCache(ArServiceRecordCache.withEntryLifetimeLimit(Duration.ZERO))
                 .plugins(new HttpJsonCloudPlugin.Builder()
                     .orchestrationStrategy(strategy)

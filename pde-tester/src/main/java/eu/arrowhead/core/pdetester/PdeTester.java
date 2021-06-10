@@ -54,17 +54,17 @@ public class PdeTester {
         try {
             return putPlantDescription(PdFiles.NO_CONNECTIONS)
                 .flatMap(result -> assertNoServices())
-                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_TEMP_1_USING_SYSTEM_NAME))
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_SYS_1_USING_PROVIDER_SYSTEM_NAME))
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertBothSystem1Services);
                 })
-                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_TEMP_2_USING_SYSTEM_METADATA))
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_SYS_2_USING_PROVIDER_SYSTEM_METADATA))
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertBothSystem2Services);
                 })
-                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_BOTH_USING_SYSTEM_METADATA))
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_BOTH_USING_PROVIDER_SYSTEM_METADATA))
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertAllServices);
@@ -73,6 +73,11 @@ public class PdeTester {
                 .flatMap(response -> {
                     assertEquals(HttpStatus.OK, response.status());
                     return retrier.run(this::assertSystem1ServiceA);
+                })
+                .flatMap(result -> putPlantDescription(PdFiles.CONNECT_TO_SYS_2_USING_CONSUMER_SYSTEM_METADATA))
+                .flatMap(response -> {
+                    assertEquals(HttpStatus.OK, response.status());
+                    return retrier.run(this::assertBothSystem2Services);
                 });
 
         } catch (IOException e) {
