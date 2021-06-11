@@ -11,8 +11,8 @@ public class PropNames {
     public final static String LOCAL_PORT = "local_port";
     public final static String PDE_HOSTNAME = "pde_hostname";
     public final static String PDE_PORT = "pde_port";
-    public final static String SR_HOSTNAME = "sr_hostname";
-    public final static String SR_PORT = "sr_port";
+    public final static String SR_HOSTNAME = "service_registry_hostname";
+    public final static String SR_PORT = "service_registry_port";
     private PropNames() {
     }
 

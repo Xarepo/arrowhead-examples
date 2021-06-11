@@ -9,8 +9,8 @@ public class PropNames {
     public static final String LOCAL_HOSTNAME = "local_hostname";
     public static final String LOCAL_PORT = "local_port";
     public static final String UID = "uid";
-    public static final String SR_HOSTNAME = "sr_hostname";
-    public static final String SR_PORT = "sr_port";
+    public static final String SR_HOSTNAME = "service_registry_hostname";
+    public static final String SR_PORT = "service_registry_port";
 
     private PropNames() {
     }
