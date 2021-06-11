@@ -8,20 +8,24 @@ import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
-
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 public class MonitorableService {
 
-    public HttpService getService(String uniqueIdentifier) {
+    public HttpService getService(
+        final Map<String, String> metadata,
+        final String uniqueIdentifier
+    ) {
+        Objects.requireNonNull(uniqueIdentifier, "Expected unique identifier");
 
-        Map<String, String> metadata = Map.of("serviceLevel", uniqueIdentifier);
         return new HttpService()
             .name("monitorable")
             .metadata(metadata)
             .codecs(CodecType.JSON)
             .accessPolicy(AccessPolicy.cloud())
-            .basePath("/monitorable")
+            .basePath("/" + uniqueIdentifier + "/monitorable")
             .get("/ping", (request, response) -> {
                 System.out.println("Handling a ping request!");
                 PingDto ping = new PingDto.Builder()
@@ -58,4 +62,7 @@ public class MonitorableService {
             });
     }
 
+    public HttpService getService(final String uniqueIdentifier) {
+        return getService(Collections.emptyMap(), uniqueIdentifier);
+    }
 }

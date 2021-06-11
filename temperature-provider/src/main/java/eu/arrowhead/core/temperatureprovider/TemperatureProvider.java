@@ -69,12 +69,13 @@ public class TemperatureProvider {
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 
+            final Map<String, String> metadata = Map.of("baseTemp", uniqueIdentifier);
 
             system.provide(new MonitorableService().getService(uniqueIdentifier))
                 .ifSuccess(result -> System.out.println("Providing monitorable service..."))
                 .onFailure(Throwable::printStackTrace);
 
-            system.provide(new TemperatureService().getService(thermometer))
+            system.provide(new TemperatureService().getService(thermometer, metadata))
                 .ifSuccess(result -> System.out.println("Providing temperature service..."))
                 .onFailure(Throwable::printStackTrace);
 

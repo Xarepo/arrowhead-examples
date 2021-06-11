@@ -1,5 +1,7 @@
 package eu.arrowhead.core.temperatureprovider;
 
+import java.util.Map;
+import java.util.Objects;
 import eu.arrowhead.core.common.TemperatureDto;
 import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.HttpStatus;
@@ -9,10 +11,17 @@ import se.arkalix.util.concurrent.Future;
 
 public class TemperatureService {
 
-    public HttpService getService(Thermometer thermometer) {
+    public HttpService getService(
+        final Thermometer thermometer,
+        final Map<String, String> metadata
+    ) {
+
+        Objects.requireNonNull(thermometer, "Expected thermometer");
+        Objects.requireNonNull(metadata, "Expected metadata");
 
         return new HttpService()
             .name("temperature")
+            .metadata(metadata)
             .codecs(CodecType.JSON)
             .accessPolicy(AccessPolicy.cloud())
             .basePath("/temperature")
