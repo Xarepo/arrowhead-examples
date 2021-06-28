@@ -1,13 +1,14 @@
 package eu.arrowhead.core.temperatureprovider;
 
-import java.util.Map;
-import java.util.Objects;
 import eu.arrowhead.core.common.TemperatureDto;
 import se.arkalix.codec.CodecType;
 import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.service.HttpService;
 import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.util.concurrent.Future;
+
+import java.util.Map;
+import java.util.Objects;
 
 public class TemperatureService {
 

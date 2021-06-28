@@ -1,53 +1,53 @@
 {
-    "plantDescription": "CONNECT_TO_SYS_2_USING_CONSUMER_SYSTEM_METADATA",
-    "active": true,
-    "systems": [
-      {
-        "metadata": {
-            "a": "1"
-        },
-        "systemId": "pdetester",
-        "ports": [
-          {
-            "portName": "port-x",
-            "serviceDefinition": "temperature",
-            "consumer": true
-          }
-        ]
+  "plantDescription": "CONNECT_TO_SYS_2_USING_CONSUMER_SYSTEM_METADATA",
+  "active": true,
+  "systems": [
+    {
+      "metadata": {
+        "a": "1"
       },
-      {
-        "systemName": "dualprovider1",
-        "systemId": "dp1",
-        "ports": [
-          {
-            "portName": "port-a",
-            "serviceDefinition": "temperature",
-            "consumer": false
-          }
-        ]
-      },
-      {
-        "systemName": "dualprovider2",
-        "systemId": "dp2",
-        "ports": [
-          {
-            "portName": "port-a",
-            "serviceDefinition": "temperature",
-            "consumer": false
-          }
-        ]
-      }
-    ],
-    "connections": [
-      {
-        "consumer": {
-          "systemId": "pdetester",
-          "portName": "port-x"
-        },
-        "producer": {
-          "systemId": "dp2",
-          "portName": "port-a"
+      "systemId": "pdetester",
+      "ports": [
+        {
+          "portName": "port-x",
+          "serviceDefinition": "temperature",
+          "consumer": true
         }
+      ]
+    },
+    {
+      "systemName": "dualprovider1",
+      "systemId": "dp1",
+      "ports": [
+        {
+          "portName": "port-a",
+          "serviceDefinition": "temperature",
+          "consumer": false
+        }
+      ]
+    },
+    {
+      "systemName": "dualprovider2",
+      "systemId": "dp2",
+      "ports": [
+        {
+          "portName": "port-a",
+          "serviceDefinition": "temperature",
+          "consumer": false
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "consumer": {
+        "systemId": "pdetester",
+        "portName": "port-x"
+      },
+      "producer": {
+        "systemId": "dp2",
+        "portName": "port-a"
       }
-    ]
-  }
+    }
+  ]
+}

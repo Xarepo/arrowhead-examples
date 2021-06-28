@@ -12,6 +12,7 @@ public class PropNames {
     public final static String LOCAL_PORT = "local_port";
     public final static String SR_HOSTNAME = "service_registry_hostname";
     public final static String SR_PORT = "service_registry_port";
+
     private PropNames() {
     }
 
