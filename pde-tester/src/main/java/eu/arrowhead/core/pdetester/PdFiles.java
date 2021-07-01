@@ -10,6 +10,7 @@ public class PdFiles {
     public static final String CONNECT_TO_SYS_2_USING_CONSUMER_SYSTEM_METADATA = "pd5.json";
     public static final String CONNECT_TO_SYS_2_SERVICE_B_USING_CONSUMER_SYSTEM_METADATA = "pd6.json";
     public static final String CONNECT_TO_B_SERVICES = "pd7.json";
+    public static final String MONITOR_SERVICE_1A = "pd8.json";
 
     private PdFiles() {
     }

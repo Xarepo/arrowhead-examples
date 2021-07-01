@@ -1,0 +1,83 @@
+{
+  "plantDescription": "MONITOR_SERVICE_1A",
+  "active": true,
+  "systems": [
+    {
+      "systemName": "plantdescriptionengine",
+      "systemId": "pde",
+      "ports": [
+        {
+            "portName": "port-monitorable",
+            "serviceDefinition": "monitorable",
+            "consumer": true
+        }
+      ]
+    },
+    {
+      "systemName": "dualprovider1",
+      "systemId": "dp1",
+      "ports": [
+        {
+          "portName": "port-a",
+          "serviceDefinition": "temperature",
+          "consumer": false,
+          "metadata": {
+              "service": "a"
+          }
+        },
+        {
+          "portName": "port-b",
+          "serviceDefinition": "temperature",
+          "consumer": false,
+          "metadata": {
+            "service": "b"
+          }
+        },
+        {
+            "portName": "port-monitorable",
+            "serviceDefinition": "monitorable",
+            "consumer": false
+          }
+      ]
+    },
+    {
+        "systemName": "dualprovider2",
+        "systemId": "dp2",
+        "ports": [
+          {
+            "portName": "port-a",
+            "serviceDefinition": "temperature",
+            "consumer": false,
+            "metadata": {
+                "service": "a"
+            }
+          },
+          {
+            "portName": "port-b",
+            "serviceDefinition": "temperature",
+            "consumer": false,
+            "metadata": {
+              "service": "b"
+            }
+          },
+          {
+              "portName": "port-monitorable",
+              "serviceDefinition": "monitorable",
+              "consumer": false
+            }
+        ]
+      }
+  ],
+  "connections": [
+    {
+      "consumer": {
+        "systemId": "pde",
+        "portName": "port-monitorable"
+      },
+      "producer": {
+        "systemId": "dp1",
+        "portName": "port-monitorable"
+      }
+    }
+  ]
+}

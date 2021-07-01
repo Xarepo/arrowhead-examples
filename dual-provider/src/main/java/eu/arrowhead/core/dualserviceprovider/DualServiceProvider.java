@@ -1,6 +1,7 @@
 package eu.arrowhead.core.dualserviceprovider;
 
 import eu.arrowhead.core.common.Metadata;
+import eu.arrowhead.core.common.MonitorableService;
 import eu.arrowhead.core.common.Props;
 import se.arkalix.ArSystem;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
@@ -62,11 +63,18 @@ public class DualServiceProvider {
                 .plugins(HttpJsonCloudPlugin.joinViaServiceRegistryAt(srSocketAddress))
                 .build();
 
+
+            final Map<String, String> metadataA = Metadata.getServiceMetadata("a");
+            final Map<String, String> metadataB = Metadata.getServiceMetadata("b");
             HttpService serviceA = new SimpleService().getService("a");
             HttpService serviceB = new SimpleService().getService("b");
+            HttpService monitorableServiceA = new MonitorableService().getService(metadataA, "a");
+            HttpService monitorableServiceB = new MonitorableService().getService(metadataB, "b");
 
             system.provide(serviceA)
                 .flatMap(result -> system.provide(serviceB))
+                .flatMap(result -> system.provide(monitorableServiceA))
+                .flatMap(result -> system.provide(monitorableServiceB))
                 .onFailure(Throwable::printStackTrace);
 
 
