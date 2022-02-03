@@ -1,5 +1,8 @@
 package eu.arrowhead.core.fan;
 
+import java.net.InetSocketAddress;
+import java.util.Timer;
+import java.util.TimerTask;
 import eu.arrowhead.core.common.TemperatureDto;
 import se.arkalix.ArSystem;
 import se.arkalix.ServiceRecord;
@@ -11,10 +14,6 @@ import se.arkalix.net.http.client.HttpClientRequest;
 import se.arkalix.query.ServiceQuery;
 import se.arkalix.util.concurrent.Future;
 import se.arkalix.util.concurrent.Futures;
-
-import java.net.InetSocketAddress;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ThermometerReader {
 
@@ -30,11 +29,11 @@ public class ThermometerReader {
     public void start() {
 
         final ServiceQuery serviceQuery = system.consume()
-            .name("temperature")
+            .name("thermometer")
             .codecTypes(CodecType.JSON)
             .protocolTypes(ProtocolType.HTTP);
 
-        int updateInterval = 1000;
+        int updateInterval = 5000;
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -47,6 +46,7 @@ public class ThermometerReader {
         serviceQuery.resolveAll()
             .ifSuccess(services -> {
                 if (services.isEmpty()) {
+										System.out.println("No services found");
                     temperature = 0;
                     return;
                 }
@@ -71,7 +71,7 @@ public class ThermometerReader {
         return httpClient
             .send(address, new HttpClientRequest()
                 .method(HttpMethod.GET)
-                .uri(service.uri() + "/temp")
+                .uri(service.uri() + "/temperature")
                 .header("accept", "application/json"))
             .flatMap(response -> response.bodyToIfSuccess(TemperatureDto::decodeJson));
     }

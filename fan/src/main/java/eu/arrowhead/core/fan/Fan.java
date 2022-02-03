@@ -1,6 +1,5 @@
 package eu.arrowhead.core.fan;
 
-import eu.arrowhead.core.common.MonitorableService;
 import eu.arrowhead.core.common.Props;
 import se.arkalix.ArServiceRecordCache;
 import se.arkalix.ArSystem;
@@ -81,11 +80,6 @@ public class Fan {
 
             FanAnimation frame = new FanAnimation(thermometerReader);
             frame.init();
-
-            final String uid = props.getString(PropNames.UID);
-            system.provide(new MonitorableService().getService(uid))
-                .ifSuccess(result -> System.out.println("Providing monitorable service..."))
-                .onFailure(Throwable::printStackTrace);
 
         } catch (final Throwable e) {
             e.printStackTrace();
