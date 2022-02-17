@@ -3,8 +3,8 @@ package eu.arrowhead.core.fan;
 import java.net.InetSocketAddress;
 import java.util.Timer;
 import java.util.TimerTask;
-import eu.arrowhead.core.common.TemperatureDto;
 import se.arkalix.ArSystem;
+import se.arkalix.ServiceInterface;
 import se.arkalix.ServiceRecord;
 import se.arkalix.codec.CodecType;
 import se.arkalix.net.ProtocolType;
@@ -33,7 +33,7 @@ public class ThermometerReader {
             .codecTypes(CodecType.JSON)
             .protocolTypes(ProtocolType.HTTP);
 
-        int updateInterval = 5000;
+        int updateInterval = 4000;
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -54,7 +54,6 @@ public class ThermometerReader {
                 Futures.serialize(services.stream().map(this::readThermometer))
                     .ifSuccess(result -> {
                         temperature = result.stream()
-                            .map(TemperatureDto::celsius)
                             .mapToDouble(t -> t)
                             .average()
                             .orElse(0);
@@ -65,16 +64,30 @@ public class ThermometerReader {
             .onFailure(Throwable::printStackTrace);
     }
 
-    private Future<TemperatureDto> readThermometer(final ServiceRecord service) {
-        final InetSocketAddress address = service.provider().socketAddress();
+		private Future<Double> readThermometer(final ServiceRecord service) {
+			final InetSocketAddress address = service.provider().socketAddress();
+			var token = service.interfaceTokens().get(ServiceInterface.HTTP_SECURE_JSON);
 
-        return httpClient
-            .send(address, new HttpClientRequest()
-                .method(HttpMethod.GET)
-                .uri(service.uri() + "/temperature")
-                .header("accept", "application/json"))
-            .flatMap(response -> response.bodyToIfSuccess(TemperatureDto::decodeJson));
-    }
+			if (token == null) {
+				throw new RuntimeException("No token!");
+			}
+
+			final var request = new HttpClientRequest()
+					.method(HttpMethod.GET)
+					.uri(service.uri() + "/properties/temperature?token=" + token)
+					// .uri("/toberemoved?token=" + token)
+					.header("accept", "application/json");
+
+					return httpClient
+					.send(address, request)
+					.map(response -> {
+						System.out.println("response.status():");
+						System.out.println(response.status());
+						return response;
+					})
+					.flatMap(response -> response.bodyAsString())
+					.map(Double::parseDouble);
+		}
 
     public double getTemperature() {
         return temperature;

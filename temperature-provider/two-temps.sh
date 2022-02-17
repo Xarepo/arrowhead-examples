@@ -1,1 +1,0 @@
-./cold.sh & ./warm.sh
