@@ -3,14 +3,18 @@ package eu.arrowhead.core.fan;
 import eu.arrowhead.core.common.Props;
 import se.arkalix.ArServiceRecordCache;
 import se.arkalix.ArSystem;
+import se.arkalix.codec.CodecType;
 import se.arkalix.core.plugin.HttpJsonCloudPlugin;
 import se.arkalix.core.plugin.or.OrchestrationOption;
 import se.arkalix.core.plugin.or.OrchestrationPattern;
 import se.arkalix.core.plugin.or.OrchestrationStrategy;
+import se.arkalix.net.http.HttpStatus;
 import se.arkalix.net.http.client.HttpClient;
+import se.arkalix.net.http.service.HttpService;
+import se.arkalix.security.access.AccessPolicy;
 import se.arkalix.security.identity.OwnedIdentity;
 import se.arkalix.security.identity.TrustStore;
-
+import se.arkalix.util.concurrent.Future;
 import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -81,6 +85,21 @@ public class Fan {
             FanAnimation frame = new FanAnimation(thermometerReader);
             frame.init();
 
+            final var pingService = new HttpService()
+                .name("ping")
+                .codecs(CodecType.JSON)
+                .accessPolicy(AccessPolicy.cloud())
+                .basePath("/")
+                .get("/ping", (request, response) -> {
+                    response
+                        .status(HttpStatus.OK)
+                        .body("ok");
+                    return Future.done();
+                });
+
+            system.provide(pingService)
+                .ifSuccess(result -> System.out.println("Providing ping service..."))
+                .onFailure(Throwable::printStackTrace);
         } catch (final Throwable e) {
             e.printStackTrace();
         }
